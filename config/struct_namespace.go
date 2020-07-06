@@ -26,6 +26,8 @@ type NamespaceConfig struct {
 
 	PrintLog bool `hcl:"print_log" yaml:"print_log"`
 
+	PredateInitialization string `hcl:"predate_initialization" yaml:"predate_initialization"`
+
 	OrderedLabelNames  []string
 	OrderedLabelValues []string
 }

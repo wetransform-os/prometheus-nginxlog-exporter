@@ -25,6 +25,7 @@ import (
 	"strconv"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/martin-helmich/prometheus-nginxlog-exporter/syslog"
 
@@ -105,50 +106,61 @@ func (m *Metrics) Init(cfg *config.NamespaceConfig) {
 		}
 	}
 
+	predate := time.Duration(0) // default disabled
+	if cfg.PredateInitialization != "" {
+		predate, _ = time.ParseDuration(cfg.PredateInitialization)
+	}
+
 	m.countTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace:   cfg.NamespacePrefix,
-		ConstLabels: cfg.NamespaceLabels,
-		Name:        "http_response_count_total",
-		Help:        "Amount of processed HTTP requests",
+		Namespace:             cfg.NamespacePrefix,
+		ConstLabels:           cfg.NamespaceLabels,
+		Name:                  "http_response_count_total",
+		Help:                  "Amount of processed HTTP requests",
+		PredateInitialization: predate,
 	}, counterLabels)
 
 	m.bytesTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace:   cfg.NamespacePrefix,
-		ConstLabels: cfg.NamespaceLabels,
-		Name:        "http_response_size_bytes",
-		Help:        "Total amount of transferred bytes",
+		Namespace:             cfg.NamespacePrefix,
+		ConstLabels:           cfg.NamespaceLabels,
+		Name:                  "http_response_size_bytes",
+		Help:                  "Total amount of transferred bytes",
+		PredateInitialization: predate,
 	}, labels)
 
 	m.upstreamSeconds = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Namespace:   cfg.NamespacePrefix,
-		ConstLabels: cfg.NamespaceLabels,
-		Name:        "http_upstream_time_seconds",
-		Help:        "Time needed by upstream servers to handle requests",
-		Objectives:  map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+		Namespace:             cfg.NamespacePrefix,
+		ConstLabels:           cfg.NamespaceLabels,
+		Name:                  "http_upstream_time_seconds",
+		Help:                  "Time needed by upstream servers to handle requests",
+		Objectives:            map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+		PredateInitialization: predate,
 	}, labels)
 
 	m.upstreamSecondsHist = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace:   cfg.NamespacePrefix,
-		ConstLabels: cfg.NamespaceLabels,
-		Name:        "http_upstream_time_seconds_hist",
-		Help:        "Time needed by upstream servers to handle requests",
-		Buckets:     cfg.HistogramBuckets,
+		Namespace:             cfg.NamespacePrefix,
+		ConstLabels:           cfg.NamespaceLabels,
+		Name:                  "http_upstream_time_seconds_hist",
+		Help:                  "Time needed by upstream servers to handle requests",
+		Buckets:               cfg.HistogramBuckets,
+		PredateInitialization: predate,
 	}, labels)
 
 	m.responseSeconds = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Namespace:   cfg.NamespacePrefix,
-		ConstLabels: cfg.NamespaceLabels,
-		Name:        "http_response_time_seconds",
-		Help:        "Time needed by NGINX to handle requests",
-		Objectives:  map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+		Namespace:             cfg.NamespacePrefix,
+		ConstLabels:           cfg.NamespaceLabels,
+		Name:                  "http_response_time_seconds",
+		Help:                  "Time needed by NGINX to handle requests",
+		Objectives:            map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+		PredateInitialization: predate,
 	}, labels)
 
 	m.responseSecondsHist = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace:   cfg.NamespacePrefix,
-		ConstLabels: cfg.NamespaceLabels,
-		Name:        "http_response_time_seconds_hist",
-		Help:        "Time needed by NGINX to handle requests",
-		Buckets:     cfg.HistogramBuckets,
+		Namespace:             cfg.NamespacePrefix,
+		ConstLabels:           cfg.NamespaceLabels,
+		Name:                  "http_response_time_seconds_hist",
+		Help:                  "Time needed by NGINX to handle requests",
+		Buckets:               cfg.HistogramBuckets,
+		PredateInitialization: predate,
 	}, labels)
 
 	m.parseErrorsTotal = prometheus.NewCounter(prometheus.CounterOpts{

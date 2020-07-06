@@ -34,4 +34,6 @@ require (
 	gopkg.in/yaml.v2 v2.3.0
 )
 
+replace github.com/prometheus/client_golang => github.com/stempler/client_golang v1.7.2-0.20200706141750-b76efb2042d1
+
 go 1.13
