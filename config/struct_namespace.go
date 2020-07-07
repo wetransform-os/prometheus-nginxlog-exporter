@@ -24,6 +24,9 @@ type NamespaceConfig struct {
 	RelabelConfigs   []RelabelConfig   `hcl:"relabel" yaml:"relabel_configs"`
 	HistogramBuckets []float64         `hcl:"histogram_buckets" yaml:"histogram_buckets"`
 
+	DisableHistogram bool `hcl:"disable_histogram" yaml:"disable_histogram"`
+	DisableSummary   bool `hcl:"disable_summary" yaml:"disable_summary"`
+
 	PrintLog bool `hcl:"print_log" yaml:"print_log"`
 
 	PredateInitialization string `hcl:"predate_initialization" yaml:"predate_initialization"`

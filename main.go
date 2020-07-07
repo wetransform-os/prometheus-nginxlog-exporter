@@ -54,10 +54,17 @@ func NewNSMetrics(cfg *config.NamespaceConfig) *NSMetrics {
 
 	m.registry.MustRegister(m.countTotal)
 	m.registry.MustRegister(m.bytesTotal)
-	m.registry.MustRegister(m.upstreamSeconds)
-	m.registry.MustRegister(m.upstreamSecondsHist)
-	m.registry.MustRegister(m.responseSeconds)
-	m.registry.MustRegister(m.responseSecondsHist)
+
+	if !cfg.DisableSummary {
+		m.registry.MustRegister(m.upstreamSeconds)
+		m.registry.MustRegister(m.responseSeconds)
+	}
+
+	if !cfg.DisableHistogram {
+		m.registry.MustRegister(m.upstreamSecondsHist)
+		m.registry.MustRegister(m.responseSecondsHist)
+	}
+
 	m.registry.MustRegister(m.parseErrorsTotal)
 	return m
 }
@@ -388,14 +395,27 @@ func processSource(nsCfg config.NamespaceConfig, t tail.Follower, parser *gonx.P
 			metrics.bytesTotal.WithLabelValues(notCounterValues...).Add(bytes)
 		}
 
-		if upstreamTime, ok := floatFromFields(fields, "upstream_response_time"); ok {
-			metrics.upstreamSeconds.WithLabelValues(notCounterValues...).Observe(upstreamTime)
-			metrics.upstreamSecondsHist.WithLabelValues(notCounterValues...).Observe(upstreamTime)
-		}
+		if !nsCfg.DisableSummary || !nsCfg.DisableHistogram {
+			// at least histogram or summary is enabled
 
-		if responseTime, ok := floatFromFields(fields, "request_time"); ok {
-			metrics.responseSeconds.WithLabelValues(notCounterValues...).Observe(responseTime)
-			metrics.responseSecondsHist.WithLabelValues(notCounterValues...).Observe(responseTime)
+			if upstreamTime, ok := floatFromFields(fields, "upstream_response_time"); ok {
+				if !nsCfg.DisableSummary {
+					metrics.upstreamSeconds.WithLabelValues(notCounterValues...).Observe(upstreamTime)
+				}
+				if !nsCfg.DisableHistogram {
+					metrics.upstreamSecondsHist.WithLabelValues(notCounterValues...).Observe(upstreamTime)
+				}
+			}
+
+			if responseTime, ok := floatFromFields(fields, "request_time"); ok {
+				if !nsCfg.DisableSummary {
+					metrics.responseSeconds.WithLabelValues(notCounterValues...).Observe(responseTime)
+				}
+				if !nsCfg.DisableHistogram {
+					metrics.responseSecondsHist.WithLabelValues(notCounterValues...).Observe(responseTime)
+				}
+			}
+
 		}
 	}
 }
