@@ -9,7 +9,8 @@ import (
 type NamespaceConfig struct {
 	Name string `hcl:",key"`
 
-	NamespaceLabelName string `hcl:"namespace_label" yaml:"namespace_label"`
+	// FIXME namespaces as labels not working with custom client_golang
+	NamespaceLabelName string // FIXME `hcl:"namespace_label" yaml:"namespace_label"`
 	NamespaceLabels    map[string]string
 
 	MetricsOverride *struct {
