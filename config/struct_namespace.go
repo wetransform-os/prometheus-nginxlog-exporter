@@ -9,7 +9,8 @@ import (
 type NamespaceConfig struct {
 	Name string `hcl:",key"`
 
-	NamespaceLabelName string `hcl:"namespace_label" yaml:"namespace_label"`
+	// FIXME namespaces as labels not working with custom client_golang
+	NamespaceLabelName string // FIXME `hcl:"namespace_label" yaml:"namespace_label"`
 	NamespaceLabels    map[string]string
 
 	MetricsOverride *struct {
@@ -24,7 +25,12 @@ type NamespaceConfig struct {
 	RelabelConfigs   []RelabelConfig   `hcl:"relabel" yaml:"relabel_configs"`
 	HistogramBuckets []float64         `hcl:"histogram_buckets" yaml:"histogram_buckets"`
 
+	DisableHistogram bool `hcl:"disable_histogram" yaml:"disable_histogram"`
+	DisableSummary   bool `hcl:"disable_summary" yaml:"disable_summary"`
+
 	PrintLog bool `hcl:"print_log" yaml:"print_log"`
+
+	PredateInitialization string `hcl:"predate_initialization" yaml:"predate_initialization"`
 
 	OrderedLabelNames  []string
 	OrderedLabelValues []string
