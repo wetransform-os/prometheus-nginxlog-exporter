@@ -25,6 +25,8 @@ type NamespaceConfig struct {
 	RelabelConfigs   []RelabelConfig   `hcl:"relabel" yaml:"relabel_configs"`
 	HistogramBuckets []float64         `hcl:"histogram_buckets" yaml:"histogram_buckets"`
 
+	SkipConfigs []SkipConfig `hcl:"skip,block" yaml:"skip"`
+
 	DisableHistogram bool `hcl:"disable_histogram" yaml:"disable_histogram"`
 	DisableSummary   bool `hcl:"disable_summary" yaml:"disable_summary"`
 
@@ -97,6 +99,12 @@ func (c *NamespaceConfig) Compile() error {
 	if c.NamespaceLabelName != "" {
 		c.NamespaceLabels = make(map[string]string)
 		c.NamespaceLabels[c.NamespaceLabelName] = c.Name
+	}
+
+	for i := range c.SkipConfigs {
+		if err := c.SkipConfigs[i].Compile(); err != nil {
+			return nil
+		}
 	}
 
 	c.OrderLabels()

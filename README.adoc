@@ -277,6 +277,15 @@ namespace "app1" {
   # log can be printed to std out, e.g. for debugging purposes (disabled by default)
   print_log = false
 
+  # log lines matching a regex may be skipped
+  skip = [
+    {
+      from = "request" # variable from access log
+      split = 2 # split by space and use the second part of the variable value
+      match = "^/skip" # if the variable value matches this regular expression, skip the line
+    }
+  ]
+
   # metrics_override = { prefix = "myprefix" }
   # namespace_label = "vhost"
 
