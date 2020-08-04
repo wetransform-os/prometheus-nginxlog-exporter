@@ -27,6 +27,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/martin-helmich/prometheus-nginxlog-exporter/skip"
 	"github.com/martin-helmich/prometheus-nginxlog-exporter/syslog"
 
 	"github.com/martin-helmich/prometheus-nginxlog-exporter/config"
@@ -377,6 +378,10 @@ func processSource(nsCfg config.NamespaceConfig, t tail.Follower, parser *gonx.P
 		}
 
 		fields := entry.Fields()
+
+		if skip.Skip(nsCfg.SkipConfigs, fields) {
+			continue
+		}
 
 		for i := range relabelings {
 			if str, ok := fields[relabelings[i].SourceValue]; ok {
