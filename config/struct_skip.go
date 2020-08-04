@@ -11,6 +11,7 @@ type SkipConfig struct {
 	FieldName    string `hcl:"from,attr" yaml:"from"`
 	RegexpString string `hcl:"match,attr" yaml:"match"`
 	Split        int    `hcl:"split,attr"`
+	Negate       bool   `hcl:"negate,attr"`
 
 	CompiledRegexp *regexp.Regexp
 }

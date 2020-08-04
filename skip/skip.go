@@ -48,5 +48,9 @@ func skip(skip *config.SkipConfig, fields gonx.Fields) bool {
 	if !ok {
 		return false
 	}
-	return skip.CompiledRegexp.MatchString(str)
+	shouldSkip := skip.CompiledRegexp.MatchString(str)
+	if skip.Negate {
+		shouldSkip = !shouldSkip
+	}
+	return shouldSkip
 }
